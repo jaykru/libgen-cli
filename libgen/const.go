@@ -21,6 +21,7 @@ const (
 	SearchHref        = "<a href='book/index.php.+</a>"
 	SearchMD5         = "[A-Z0-9]{32}"
 	booksdlReg        = "http://80.82.78.13/get\\.php\\?md5=\\w{32}\\&key=\\w{16}&mirr=1"
+	liblolreg         = "https://cloudflare-ipfs.com/ipfs/[a-z0-9]*\\?filename=.+?(gz|pdf|rar|djvu|epub|chm)"
 	bokReg            = `\/dl\/\d{6}\/\w{6}`
 	dbdumpReg         = `(["])(.*?\.(rar|sql.gz))"`
 	bokDownloadLimit  = "WARNING: There are more than 5 downloads from your IP"

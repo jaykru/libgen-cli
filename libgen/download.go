@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
@@ -122,39 +121,17 @@ func DownloadDbdump(filename string, outputPath string) error {
 
 // GetDownloadURL picks a random download mirror to download the specified
 // resource from.
-// This is a hack that I don't like and needs to be revisited.
 func GetDownloadURL(book *Book) error {
-	chosenMirror := DownloadMirrors[rand.Intn(3)]
+	// chosenMirror := DownloadMirrors[rand.Intn(3)]
+	// chosenMirror := DownloadMirrors[0]
 
 	var x int
 	tries := 3
 	for tries >= x {
-		switch chosenMirror.String() {
-		case "80.82.78.13":
-			if err := getBooksdlDownloadURL(book); err != nil {
-				if err = getBokDownloadURL(book); err != nil {
-					if err := getNineThreeURL(book); err != nil {
-						return err
-					}
-				}
-			}
-		case "https://b-ok.cc":
-			if err := getBokDownloadURL(book); err != nil {
-				if err = getNineThreeURL(book); err != nil {
-					if err = getBooksdlDownloadURL(book); err != nil {
-						return err
-					}
-				}
-			}
-		case "http://93.174.95.29":
-			if err := getNineThreeURL(book); err != nil {
-				if err = getBooksdlDownloadURL(book); err != nil {
-					if err = getBokDownloadURL(book); err != nil {
-						return err
-					}
-				}
-			}
+		if err := getLiblolDownloadURL(book); err != nil {
+			return err
 		}
+		
 		if book.DownloadURL != "" {
 			break
 		}
@@ -168,23 +145,21 @@ func GetDownloadURL(book *Book) error {
 	return nil
 }
 
-func getBooksdlDownloadURL(book *Book) error {
+func getLiblolDownloadURL(book *Book) error {
 	baseURL := &url.URL{
 		Scheme: "http",
-		Host:   "libgen.lc",
-		Path:   "ads.php",
+		Host:   "library.lol",
+		Path:   "main/",
 	}
-	q := baseURL.Query()
-	q.Set("md5", book.Md5)
-	baseURL.RawQuery = q.Encode()
-	book.PageURL = baseURL.String()
+	q := baseURL.String() + strings.ToUpper(book.Md5)
+	book.PageURL = q
 
-	b, err := getBody(baseURL.String())
+	b, err := getBody(q)
 	if err != nil {
 		return err
 	}
 
-	book.DownloadURL = string(findMatch(booksdlReg, b))
+	book.DownloadURL = string(findMatch(liblolreg, b))
 
 	return nil
 }

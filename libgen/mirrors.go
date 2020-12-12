@@ -25,7 +25,7 @@ var SearchMirrors = []url.URL{
 	},
 	{
 		Scheme: "https",
-		Host:   "libgen.is",
+		Host:   "libgen.rs",
 	},
 	{
 		Scheme: "https",
@@ -39,6 +39,7 @@ var SearchMirrors = []url.URL{
 		Scheme: "https",
 		Host:   "93.174.95.27",
 	},
+	
 }
 
 // DownloadMirrors contains all valid and tested mirrors used for
