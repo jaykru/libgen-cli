@@ -22,8 +22,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/ciehanski/libgen-cli/cmd/libgen-cli"
-	"github.com/ciehanski/libgen-cli/libgen"
+	"github.com/jaykru/libgen-cli/cmd/libgen-cli"
+	"github.com/jaykru/libgen-cli/libgen"
 )
 
 func main() {
