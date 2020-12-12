@@ -41,22 +41,3 @@ var SearchMirrors = []url.URL{
 	},
 	
 }
-
-// DownloadMirrors contains all valid and tested mirrors used for
-// downloading content from Library Genesis.
-var DownloadMirrors = []url.URL{
-	// booksdl.org no longer used by libgen.
-	// New mirror URL/IP: 80.82.78.13
-	{
-		Scheme: "http",
-		Host:   "80.82.78.13",
-	},
-	{
-		Scheme: "https",
-		Host:   "b-ok.cc",
-	},
-	{
-		Scheme: "http",
-		Host:   "93.174.95.29",
-	},
-}

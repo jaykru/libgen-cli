@@ -1,5 +1,6 @@
 // Copyright © 2019 Antoine Chiny <antoine.chiny@inria.fr>
 // Copyright © 2019 Ryan Ciehanski <ryan@ciehanski.com>
+// Copyright © 2020 Jay Kruer <j@dank.systems>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +17,10 @@
 package libgen
 
 import (
-	"crypto/tls"
+	// "crypto/tls" // TODO: get library.lol working over tls?
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -122,9 +122,6 @@ func DownloadDbdump(filename string, outputPath string) error {
 // GetDownloadURL picks a random download mirror to download the specified
 // resource from.
 func GetDownloadURL(book *Book) error {
-	// chosenMirror := DownloadMirrors[rand.Intn(3)]
-	// chosenMirror := DownloadMirrors[0]
-
 	var x int
 	tries := 3
 	for tries >= x {
@@ -160,97 +157,6 @@ func getLiblolDownloadURL(book *Book) error {
 	}
 
 	book.DownloadURL = string(findMatch(liblolreg, b))
-
-	return nil
-}
-
-func getBokDownloadURL(book *Book) error {
-	baseURL := url.URL{
-		Scheme: "https",
-		Host:   "b-ok.cc",
-		Path:   "md5/",
-	}
-	queryURL := baseURL.String() + book.Md5
-	book.PageURL = queryURL
-
-	b, err := getBody(queryURL)
-	if err != nil {
-		return err
-	}
-
-	downloadURL := findMatch(bokReg, b)
-	if downloadURL == nil {
-		return errors.New("no valid download DownloadURL found")
-	}
-
-	book.DownloadURL = "https://b-ok.cc" + string(downloadURL)
-
-	if err := checkBokDownloadLimit(book); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// checkBokDownloadLimit checks the response from the b-ok.cc
-// download page and scans it for text stating there have
-// been more than 5 downloads from your IP in the past 24
-// hours and returns an error if so.
-func checkBokDownloadLimit(book *Book) error {
-	req, err := http.NewRequest("GET", book.DownloadURL, nil)
-	if err != nil {
-		return err
-	}
-	req.Header.Add("Referer", book.PageURL)
-	client := http.Client{
-		Timeout: HTTPClientTimeout,
-		Transport: &http.Transport{
-			Proxy:           http.ProxyFromEnvironment,
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	re := regexp.MustCompile(bokDownloadLimit)
-	matches := re.FindAllString(string(b), -1)
-
-	if len(matches) > 0 {
-		return errors.New("download limit reached for b-ok.cc")
-	}
-
-	if err := resp.Body.Close(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func getNineThreeURL(book *Book) error {
-	baseURL := url.URL{
-		Scheme: "http",
-		Host:   "93.174.95.29",
-		Path:   "_ads/",
-	}
-	queryURL := baseURL.String() + book.Md5
-	book.PageURL = queryURL
-
-	b, err := getBody(queryURL)
-	if err != nil {
-		return err
-	}
-
-	downloadURL := findMatch(nineThreeReg, b)
-	if downloadURL == nil {
-		return errors.New("no valid download DownloadURL found")
-	}
-
-	book.DownloadURL = "http://93.174.95.29" + string(downloadURL)
 
 	return nil
 }
